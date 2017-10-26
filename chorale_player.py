@@ -124,7 +124,7 @@ def write_chorale(chorale, track_title, tempo = 120 , extra_last_note = False):
     if extra_last_note == True:
         mf.addNote(track, channel, pitch, time, 8, volume)
     # write it to disk
-    with open("C:/Users/Craig/eclipse-workspace/test_keras/chorales_generation/outputs/midis/{}.mid".format(track_title), 'wb') as outf:
+    with open("outputs/midis/{}.mid".format(track_title), 'wb') as outf:
         mf.writeFile(outf)
     
     return track_title
