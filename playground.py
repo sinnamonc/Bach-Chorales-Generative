@@ -1,4 +1,4 @@
-''' A place to load a model and feel it different initial phrases to see what the model does! '''
+''' A place to load a model and feed it different initial phrases to see what the model does! '''
 from data_preprocessing import preprocess_notes_as_array
 from data_preprocessing import array_is_nan
 from chorales_generation import sample

@@ -59,7 +59,7 @@ def preprocess_notes_as_array(keysig = False):
     usecols = np.arange(numcols)
     
     # Read the data
-    data = pd.read_table('C:/Users/Craig/eclipse-workspace/test_keras/chorales_generation/data/chorales.csv',
+    data = pd.read_table('data/chorales.csv',
                          sep=',', names=usecols, engine='python', header=None)
     # Remove the first column and every other column which contain attribute names. 
     # The first column is an unneeded index column.
