@@ -1,7 +1,7 @@
 ''' A place to load a model and feed it different initial phrases to see what the model does! '''
 from data_preprocessing import preprocess_notes_as_array
 from data_preprocessing import array_is_nan
-from chorales_generation import sample
+from utilities import sample
 from data_preprocessing import chorale_intro
 
 import pandas as pd
@@ -21,10 +21,7 @@ index = np.argwhere(array_is_nan(data_array))
 # Convert the corpus into a list and delete the (nan,nan) entries
 corpus = np.ndarray.tolist(np.delete(data_array, index))
 
-# path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/corpus-datasets/nietzsche.txt')
-# corpus = open(path).read().lower()
 print('corpus length:', len(corpus))
-
 
 notes = sorted(list(set(corpus)))
 print('total notes:', len(notes))
@@ -89,5 +86,3 @@ for diversity in [0.2, 0.5, 1.0, 1.2]:
     from chorale_player import play_chorale_midi
 
     play_chorale_midi(track_name)
-
-# If you just save the weights, can you use that to predict without retraining?
