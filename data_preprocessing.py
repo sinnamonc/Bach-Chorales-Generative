@@ -125,3 +125,96 @@ def chorale_intro(num_notes = 10, num_chorale = 0, keysig = False):
     
     return intro
 
+
+# Function to transpose a chorale into many different keys
+def midi_transpose(chorale):
+    
+    ''' This function transposes a given chorale into many different keys and returns all of them.
+    Transposition is very easy in midi format, as one just needs to add a fixed number to each midi number.
+    By adding 5 times the different between the key signature I have and the key signature I want, I get
+    the correct transposition. Bach's chorales only use notes between midi pitches 60 and 79, so I keep the
+    transposed values close to this range also.
+    
+    Arguments: chorale - a list with entries of the form (midi pitch, dur, kigsig)
+    
+    Returns: a list of lists containing the original chorale and several transposed versions.
+    ''' 
+    
+    max = 79
+    min = 60
+    
+    keysig = chorale[0][2]    
+    
+    transposed = []
+
+    for sig in np.arange(-4,5):
+        transposed_chorale = []
+        for note in chorale:
+            transposed_note = []
+            if np.abs((5*(sig-keysig))%12)>6:
+                adjustment = ((5*(sig-keysig))%12)-12
+            else:
+                adjustment = (5*(sig-keysig))%12    
+            transposed_note.append(note[0] + adjustment)
+            transposed_note.append(note[1])
+            transposed_note.append(sig)
+            transposed_chorale.append(transposed_note)
+        transposed.append(transposed_chorale)
+    
+    return transposed
+
+# Function to make notes of the form (pitch, dur, keysig) 
+# and return a dataframe containing the music in that format
+# where we have also taken each chorale and transposed it into 8 other key signatures
+def get_chorales_as_list_with_transpositions():
+    
+    '''Imports the chorales.csv dataset, transposes each chorale into 8 other key signatures
+    and returns a list containing all of the chorales
+    '''
+    
+    # Set the number of columns to be imported. This is based on the longest row. The dataframe will have many 
+    # entries that are None or NaN.
+    
+    # Inputs: 
+    numcols = 1034
+    usecols = np.arange(numcols)
+    
+    # Read the data
+    data = pd.read_table('data/chorales.csv',
+                         sep=',', names=usecols, engine='python', header=None)
+    # Remove the first column and every other column which contain attribute names. 
+    # The first column is an unneeded index column.
+    data = data.iloc[:,2::2]
+    # print("data Successfully Read")
+    
+    
+    # Create the desired column names using the attribute names. We make each one unique 
+    # by adding a trailing number.
+    colnames = []
+    for i in range(((len(data.columns)) // 6)):
+        colnames = colnames + ['st{}'.format(i + 1), 'pitch{}'.format(i + 1), 'dur{}'.format(i + 1), 'keysig{}'.format(i + 1)
+                               , 'timesig{}'.format(i + 1), 'fermata{}'.format(i + 1)]
+    # Set the new column names
+    data.columns = colnames
+    
+    # Zip the pitchi and duri and keysigi columns into a new column notei for each i
+    # The entry in each not column will be of the form (pitch, dur, keysig).
+    for i in range((len(data.columns) // 6)):
+       data['note{}'.format(i + 1)] = list(zip(data['pitch{}'.format(i + 1)], data['dur{}'.format(i + 1)], 
+                                                   data['keysig{}'.format(i + 1)]))
+    # Extract only the columns whose name starts with note and create our desired dataframe df containing only
+    # those columns.
+    filter_col = [col for col in data if col.startswith('note')]
+    df = data[filter_col]
+    # print("Created dataframe containing the notes successfully.")
+    # print("Sample:\n{}".format(df.iloc(1)[50:]))
+    
+    data_array = df.values
+    transposed_array = []
+    for chorale in data_array:
+        transposed = midi_transpose(chorale)
+        transposed_array.append(transposed[0])
+    
+    return transposed_array
+
+    
